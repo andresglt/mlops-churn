@@ -1,16 +1,21 @@
 import os
-import mlflow
+import pickle
 import pandas as pd
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import List, Dict, Any
 
-# Configurar tracking (URI y token por variables de entorno en Render)
-mlflow.set_tracking_uri(os.environ.get("MLFLOW_TRACKING_URI"))
-MLMODEL_URI = os.environ.get("MLMODEL_URI", "models:/churn-model/Production")
+# Ruta del modelo versionado con DVC
+MODEL_PATH = os.environ.get("MODEL_PATH", "models/best_model.pkl")
 
-# Carga modelo como PyFunc
-model = mlflow.pyfunc.load_model(MLMODEL_URI)
+# Cargar el modelo desde archivo local
+try:
+    with open(MODEL_PATH, "rb") as f:
+        model = pickle.load(f)
+    print(f"✅ Modelo cargado desde {MODEL_PATH}")
+except FileNotFoundError:
+    model = None
+    print(f"❌ Modelo no encontrado en {MODEL_PATH}. Asegúrate de ejecutar 'dvc pull' antes de iniciar el servicio.")
 
 app = FastAPI(title="Churn Model API")
 
@@ -22,13 +27,15 @@ class Batch(BaseModel):
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "ok", "model_loaded": model is not None}
 
 @app.post("/predict")
 def predict(batch: Batch):
+    if model is None:
+        return {"error": "Modelo no cargado"}
     df = pd.DataFrame([r.features for r in batch.records])
     preds = model.predict(df)
-    # Si el modelo devuelve probabilidades, asegurar formato
+    # Asegurar formato de salida
     try:
         proba = preds if isinstance(preds, (list, tuple)) else preds.tolist()
     except Exception:
