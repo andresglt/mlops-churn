@@ -17,6 +17,9 @@ jobs:
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
       AZURE_WORKSPACE_NAME: ${{ secrets.AZURE_WORKSPACE_NAME }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }} 
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }} 
+      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
 
     steps:
     - name: Checkout
@@ -30,7 +33,7 @@ jobs:
     - name: Install deps
       run: |
         pip install -r requirements.txt
-        pip install azureml-core mlflow dvc[azure]
+        pip install azureml-core azureml-mlflow mlflow dvc[azure]
 
     - name: Configure DVC Azure remote
       env:
