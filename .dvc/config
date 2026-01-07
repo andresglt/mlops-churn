@@ -1,0 +1,6 @@
+[core]
+    remote = azure
+['remote "azure"']
+    url = azure://mlops-dvc
+    account_name = dvcstorageclasemlops
+    account_key = KSq0TlwLU4b+jtowJBYOv3j/VKPnlpDJx16RrKknR3V1DHDFB4tB7uhP4mr0O03nIs1ZA8t0mCfV+AStO1Rh9g==
