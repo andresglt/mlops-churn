@@ -1,0 +1,70 @@
+schema: '2.0'
+stages:
+  preprocess:
+    cmd: python src/preprocess.py
+    deps:
+    - path: data/raw/churn.csv
+      hash: md5
+      md5: c7603da904fa561b5a7eb90b8d2b7d4a
+      size: 977501
+    - path: params.yaml
+      hash: md5
+      md5: aa08fcd4adcce2d2b8f27e9cde516590
+      size: 318
+    - path: src/preprocess.py
+      hash: md5
+      md5: ce2e5d05f8e833a6cf6cc3ac944ad388
+      size: 2354
+    outs:
+    - path: data/processed/X_test.parquet
+      hash: md5
+      md5: d12169e8270836bb96683ab4b65bf75b
+      size: 5956902
+    - path: data/processed/X_train.parquet
+      hash: md5
+      md5: 1013e7e96bed1783f2a994ad9cfce703
+      size: 6140830
+    - path: data/processed/y_test.parquet
+      hash: md5
+      md5: f8a8c5280ee60f7cc60ec790f9e4ad0f
+      size: 1419
+    - path: data/processed/y_train.parquet
+      hash: md5
+      md5: 7cc3a492dc26741d07ebb785768adf46
+      size: 2014
+  train:
+    cmd: python src/train.py
+    deps:
+    - path: data/processed/X_test.parquet
+      hash: md5
+      md5: d12169e8270836bb96683ab4b65bf75b
+      size: 5956902
+    - path: data/processed/X_train.parquet
+      hash: md5
+      md5: 1013e7e96bed1783f2a994ad9cfce703
+      size: 6140830
+    - path: data/processed/y_test.parquet
+      hash: md5
+      md5: f8a8c5280ee60f7cc60ec790f9e4ad0f
+      size: 1419
+    - path: data/processed/y_train.parquet
+      hash: md5
+      md5: 7cc3a492dc26741d07ebb785768adf46
+      size: 2014
+    - path: params.yaml
+      hash: md5
+      md5: aa08fcd4adcce2d2b8f27e9cde516590
+      size: 318
+    - path: src/train.py
+      hash: md5
+      md5: d30846e1e688a6ee8e5be711226173f2
+      size: 3970
+    outs:
+    - path: metrics.json
+      hash: md5
+      md5: e695e063488720d49670b76e5dfefa8a
+      size: 88
+    - path: models/best_model.pkl
+      hash: md5
+      md5: 477e3fd790fdd3d0157dba9babc8cba2
+      size: 121007
