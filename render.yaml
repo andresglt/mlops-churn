@@ -5,7 +5,6 @@ services:
     plan: free
     repo: https://github.com/tuusuario/mlops-churn
     branch: main
-    rootDir: serving
-    dockerfilePath: Dockerfile
+    rootDir: .
+    dockerfilePath: serving/Dockerfile.dockerfile
     autoDeploy: true
-
