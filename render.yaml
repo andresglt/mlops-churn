@@ -3,7 +3,7 @@ services:
     name: churn-api
     env: docker
     plan: free
-    repo: https://github.com/tuusuario/mlops-churn
+    repo: https://github.com/andresglt/mlops-churn
     branch: main
     rootDir: .
     dockerfilePath: serving/Dockerfile.dockerfile
