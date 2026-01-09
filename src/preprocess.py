@@ -14,11 +14,12 @@ test_size = params["preprocess"]["test_size"]
 random_state = params["preprocess"]["random_state"]
 
 # Carga dataset
-df = pd.read_csv("data/raw/churn.csv")
+df = pd.read_csv("data/raw/churn.csv", delimiter=";")
 
 # Objetivo
-target = "churn"
-y = df[target].astype(int)
+target = "Churn"
+y = df[target].map({"Yes": 1, "No": 0})
+#y = df[target].astype(int)
 X = df.drop(columns=[target])
 
 # Detecta tipos
@@ -68,3 +69,14 @@ meta = {
 pd.Series(meta).to_json("data/processed/meta.json")
 
 print("Preprocesamiento completo.")
+
+import pickle
+
+# Crear carpeta models si no existe
+pathlib.Path("models").mkdir(parents=True, exist_ok=True)
+
+# Guardar el preprocesador entrenado
+with open("models/preprocessor.pkl", "wb") as f:
+    pickle.dump(preprocessor, f)
+
+print("✅ Preprocesador guardado en models/preprocessor.pkl")
