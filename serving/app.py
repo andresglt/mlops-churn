@@ -41,3 +41,4 @@ def predict(batch: Batch):
     except Exception:
         proba = preds
     return {"predictions": proba}
+
