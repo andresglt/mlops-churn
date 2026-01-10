@@ -13,8 +13,8 @@ stages:
       size: 318
     - path: src/preprocess.py
       hash: md5
-      md5: ce2e5d05f8e833a6cf6cc3ac944ad388
-      size: 2354
+      md5: 5767cb0162da6a76cb5adc88f8547621
+      size: 2659
     outs:
     - path: data/processed/X_test.parquet
       hash: md5
@@ -24,6 +24,10 @@ stages:
       hash: md5
       md5: 1013e7e96bed1783f2a994ad9cfce703
       size: 6140830
+    - path: data/processed/meta.json
+      hash: md5
+      md5: 5b08128c857d85cc987f83b8e8dfdb7e
+      size: 333
     - path: data/processed/y_test.parquet
       hash: md5
       md5: f8a8c5280ee60f7cc60ec790f9e4ad0f
@@ -32,6 +36,10 @@ stages:
       hash: md5
       md5: 7cc3a492dc26741d07ebb785768adf46
       size: 2014
+    - path: models/preprocessor.pkl
+      hash: md5
+      md5: c945a352b6b05e27e315ca8212939de4
+      size: 124172
   train:
     cmd: python src/train.py
     deps:
@@ -51,6 +59,10 @@ stages:
       hash: md5
       md5: 7cc3a492dc26741d07ebb785768adf46
       size: 2014
+    - path: models/preprocessor.pkl
+      hash: md5
+      md5: c945a352b6b05e27e315ca8212939de4
+      size: 124172
     - path: params.yaml
       hash: md5
       md5: aa08fcd4adcce2d2b8f27e9cde516590

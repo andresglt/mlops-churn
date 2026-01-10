@@ -33,3 +33,5 @@ models/*
 .DS_Store
 Thumbs.db
 activar_env.txt
+.env
+/metrics.json
