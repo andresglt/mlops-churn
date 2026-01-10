@@ -1,3 +1,5 @@
+
+
 import os
 import pickle
 import pandas as pd
@@ -51,9 +53,16 @@ def predict(batch: Batch):
 
     try:
         preds = model.predict(X)
-        proba = preds.tolist() if hasattr(preds, "tolist") else preds
+        preds_list = preds.tolist() if hasattr(preds, "tolist") else preds
     except Exception as e:
         return {"error": f"Error al predecir: {str(e)}"}
 
-    return {"predictions": proba}
+    # Emparejar cada predicción con su customerID original
+    results = []
+    for rec, pred in zip(raw_records, preds_list):
+        results.append({
+            "customerID": rec.get("customerID"),
+            "prediction": pred
+        })
 
+    return {"results": results}
