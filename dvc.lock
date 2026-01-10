@@ -13,21 +13,21 @@ stages:
       size: 318
     - path: src/preprocess.py
       hash: md5
-      md5: 5767cb0162da6a76cb5adc88f8547621
-      size: 2659
+      md5: 812e8885e89baaf414e6b2fd2d80572c
+      size: 2865
     outs:
     - path: data/processed/X_test.parquet
       hash: md5
-      md5: d12169e8270836bb96683ab4b65bf75b
-      size: 5956902
+      md5: 88f8e7887f6a16f691f24547b8c6f5cf
+      size: 55837
     - path: data/processed/X_train.parquet
       hash: md5
-      md5: 1013e7e96bed1783f2a994ad9cfce703
-      size: 6140830
+      md5: c1e04dbe42209c22a946a8ffc4863768
+      size: 133584
     - path: data/processed/meta.json
       hash: md5
-      md5: 5b08128c857d85cc987f83b8e8dfdb7e
-      size: 333
+      md5: 41fcd072826403f14ab9475dd370a789
+      size: 340
     - path: data/processed/y_test.parquet
       hash: md5
       md5: f8a8c5280ee60f7cc60ec790f9e4ad0f
@@ -38,19 +38,19 @@ stages:
       size: 2014
     - path: models/preprocessor.pkl
       hash: md5
-      md5: c945a352b6b05e27e315ca8212939de4
-      size: 124172
+      md5: 2a4d4838c21e8b4e353baca1b3e5f1b5
+      size: 3621
   train:
     cmd: python src/train.py
     deps:
     - path: data/processed/X_test.parquet
       hash: md5
-      md5: d12169e8270836bb96683ab4b65bf75b
-      size: 5956902
+      md5: 88f8e7887f6a16f691f24547b8c6f5cf
+      size: 55837
     - path: data/processed/X_train.parquet
       hash: md5
-      md5: 1013e7e96bed1783f2a994ad9cfce703
-      size: 6140830
+      md5: c1e04dbe42209c22a946a8ffc4863768
+      size: 133584
     - path: data/processed/y_test.parquet
       hash: md5
       md5: f8a8c5280ee60f7cc60ec790f9e4ad0f
@@ -61,8 +61,8 @@ stages:
       size: 2014
     - path: models/preprocessor.pkl
       hash: md5
-      md5: c945a352b6b05e27e315ca8212939de4
-      size: 124172
+      md5: 2a4d4838c21e8b4e353baca1b3e5f1b5
+      size: 3621
     - path: params.yaml
       hash: md5
       md5: aa08fcd4adcce2d2b8f27e9cde516590
@@ -74,9 +74,9 @@ stages:
     outs:
     - path: metrics.json
       hash: md5
-      md5: e695e063488720d49670b76e5dfefa8a
-      size: 88
+      md5: 59cc9d5e7a2a6bd2cb1dd6b93d443b22
+      size: 87
     - path: models/best_model.pkl
       hash: md5
-      md5: 477e3fd790fdd3d0157dba9babc8cba2
-      size: 121007
+      md5: 08c8145aaaf8a74b4c6270edb9b0ac7a
+      size: 120360

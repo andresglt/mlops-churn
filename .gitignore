@@ -35,3 +35,7 @@ Thumbs.db
 activar_env.txt
 .env
 /metrics.json
+
+#carpeta de pruebas local
+infer/*
+logreg_model*
