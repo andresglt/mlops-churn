@@ -7,6 +7,8 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 import yaml
 import pathlib
+import pickle
+import json
 
 # Carga parámetros
 params = yaml.safe_load(open("params.yaml"))
@@ -19,8 +21,15 @@ df = pd.read_csv("data/raw/churn.csv", delimiter=";")
 # Objetivo
 target = "Churn"
 y = df[target].map({"Yes": 1, "No": 0})
-#y = df[target].astype(int)
 X = df.drop(columns=[target])
+
+# Excluir columnas irrelevantes
+if "customerID" in X.columns:
+    X = X.drop(columns=["customerID"])
+
+# Convertir TotalCharges a numérica
+if "TotalCharges" in X.columns:
+    X["TotalCharges"] = pd.to_numeric(X["TotalCharges"], errors="coerce")
 
 # Detecta tipos
 numeric_cols = X.select_dtypes(include=["int64", "float64"]).columns.tolist()
@@ -66,17 +75,12 @@ meta = {
     "numeric_cols": numeric_cols,
     "categorical_cols": categorical_cols,
 }
-pd.Series(meta).to_json("data/processed/meta.json")
-
-print("Preprocesamiento completo.")
-
-import pickle
-
-# Crear carpeta models si no existe
-pathlib.Path("models").mkdir(parents=True, exist_ok=True)
+with open("data/processed/meta.json", "w") as f:
+    json.dump(meta, f)
 
 # Guardar el preprocesador entrenado
+pathlib.Path("models").mkdir(parents=True, exist_ok=True)
 with open("models/preprocessor.pkl", "wb") as f:
     pickle.dump(preprocessor, f)
 
-print("✅ Preprocesador guardado en models/preprocessor.pkl")
+print("✅ Preprocesamiento completo. Preprocesador guardado en models/preprocessor.pkl")
