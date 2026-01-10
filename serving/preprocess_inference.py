@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import pickle
 import json
-import pathlib
 
 # Cargar el preprocesador entrenado
 with open("models/preprocessor.pkl", "rb") as f:
@@ -19,14 +18,26 @@ def preprocess_new_data(raw_records):
     Ejemplo:
     [{"customerID":"1234","gender":"Male","SeniorCitizen":0,...}]
     """
-    # Convertir a DataFrame
     df = pd.DataFrame(raw_records)
 
-    # Asegurar que las columnas estén en el mismo orden
+    # Excluir columnas irrelevantes si aparecen
+    for col in ["customerID", "Churn"]:
+        if col in df.columns:
+            df = df.drop(columns=[col])
+
+    # Convertir TotalCharges a numérica si existe
+    if "TotalCharges" in df.columns:
+        df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
+
+    # Asegurar orden de columnas
     expected_cols = numeric_cols + categorical_cols
-    df = df[expected_cols]
+    try:
+        df = df[expected_cols]
+    except KeyError as e:
+        raise ValueError(f"Columnas faltantes o incorrectas en el payload: {str(e)}")
 
     # Transformar con el preprocesador entrenado
     X = preprocessor.transform(df)
 
     return X
+    
