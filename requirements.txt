@@ -9,3 +9,5 @@ azureml-core
 azureml-mlflow
 fastapi
 uvicorn
+python-dotenv
+azure-cli
