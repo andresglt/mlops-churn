@@ -5,6 +5,9 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import List, Dict, Any
 
+# Importa tu función de preprocesamiento
+from preprocess_inference import preprocess_new_data
+
 # Ruta del modelo versionado con DVC
 MODEL_PATH = os.environ.get("MODEL_PATH", "models/best_model.pkl")
 
@@ -25,6 +28,10 @@ class Record(BaseModel):
 class Batch(BaseModel):
     records: List[Record]
 
+@app.get("/")
+def root():
+    return {"message": "Bienvenido a la Churn Model API. Usa /health o /predict."}
+
 @app.get("/health")
 def health():
     return {"status": "ok", "model_loaded": model is not None}
@@ -33,12 +40,20 @@ def health():
 def predict(batch: Batch):
     if model is None:
         return {"error": "Modelo no cargado"}
-    df = pd.DataFrame([r.features for r in batch.records])
-    preds = model.predict(df)
-    # Asegurar formato de salida
+
+    raw_records = [r.features for r in batch.records]
+
     try:
-        proba = preds if isinstance(preds, (list, tuple)) else preds.tolist()
-    except Exception:
-        proba = preds
+        # Preprocesar con tu módulo externo
+        X = preprocess_new_data(raw_records)
+    except Exception as e:
+        return {"error": f"Error al preprocesar datos: {str(e)}"}
+
+    try:
+        preds = model.predict(X)
+        proba = preds.tolist() if hasattr(preds, "tolist") else preds
+    except Exception as e:
+        return {"error": f"Error al predecir: {str(e)}"}
+
     return {"predictions": proba}
 
