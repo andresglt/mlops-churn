@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from typing import List, Dict, Any
 
 # Importa tu función de preprocesamiento
-from preprocess_inference import preprocess_new_data
+from serving.preprocess_inference import preprocess_new_data
 
 # Ruta del modelo versionado con DVC
 MODEL_PATH = os.environ.get("MODEL_PATH", "models/best_model.pkl")
