@@ -5,7 +5,7 @@ xgboost
 pyarrow
 mlflow
 dvc[azure]
-azure-ai-ml
+azureml-core
 azureml-mlflow
 fastapi
 uvicorn
