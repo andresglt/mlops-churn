@@ -17,8 +17,8 @@ jobs:
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       AZURE_RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
       AZURE_WORKSPACE_NAME: ${{ secrets.AZURE_WORKSPACE_NAME }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }} 
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }} 
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
 
     steps:
@@ -30,7 +30,7 @@ jobs:
       with:
         python-version: "3.11"
 
-    - name: Install deps
+    - name: Install dependencies
       run: |
         pip install -r requirements.txt
         pip install azureml-core azureml-mlflow mlflow dvc[azure]
@@ -49,11 +49,9 @@ jobs:
     - name: Reproduce pipeline
       run: dvc repro
 
-    - name: Authenticate with Azure
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-
+    # 🔑 Ya no usamos azure/login con creds JSON, porque tu train.py
+    # hace la autenticación con ServicePrincipalAuthentication usando env vars.
+    # Así evitamos el error de "Not all values are present".
     - name: Train and log in MLflow (Azure ML backend)
       run: python src/train.py
 
