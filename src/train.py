@@ -12,10 +12,10 @@ from xgboost import XGBClassifier
 import joblib
 import pathlib
 
-# Azure ML SDK v2
-from azure.identity import DefaultAzureCredential
-from azure.ai.ml import MLClient
-from azure.ai.ml.entities import Model
+
+# Azure ML SDK
+from azureml.core import Workspace, Model
+from azureml.core.authentication import ServicePrincipalAuthentication
 
 # 🔐 Cargar variables de entorno desde .env (solo en local)
 try:
@@ -28,18 +28,23 @@ except ImportError:
 params = yaml.safe_load(open("params.yaml"))
 registered_model_name = params["model"]["registered_model_name"]
 
-# Autenticación con Service Principal (usa variables de entorno)
-credential = DefaultAzureCredential()
+# Autenticación con Service Principal
+sp_auth = ServicePrincipalAuthentication(
+    tenant_id=os.environ["AZURE_TENANT_ID"],
+    service_principal_id=os.environ["AZURE_CLIENT_ID"],
+    service_principal_password=os.environ["AZURE_CLIENT_SECRET"]
+)
 
-ml_client = MLClient(
-    credential=credential,
+# Conectar al Workspace
+ws = Workspace.get(
+    name=os.environ["AZURE_WORKSPACE_NAME"],
     subscription_id=os.environ["AZURE_SUBSCRIPTION_ID"],
     resource_group=os.environ["AZURE_RESOURCE_GROUP"],
-    workspace_name=os.environ["AZURE_WORKSPACE_NAME"]
+    auth=sp_auth
 )
 
 # Configurar MLflow con Azure ML
-mlflow.set_tracking_uri(ml_client.workspaces.get(os.environ["AZURE_WORKSPACE_NAME"]).mlflow_tracking_uri)
+mlflow.set_tracking_uri(ws.get_mlflow_tracking_uri())
 mlflow.set_experiment("churn-mlops")
 
 # Carga data
@@ -108,10 +113,9 @@ joblib.dump(best_model, "models/best_model.pkl")
 with open("metrics.json", "w") as f:
     json.dump({"auc": best_auc, **scores}, f)
 
-# 📌 Registro oficial del modelo en Azure ML (SDK v2)
-model = Model(
-    path="models/best_model.pkl",
-    name=registered_model_name,
-    description="Modelo de churn entrenado con LogReg/XGBoost"
+# 📌 Registro oficial del modelo en Azure ML
+Model.register(
+    workspace=ws,
+    model_path="models/best_model.pkl",   # ruta al archivo local
+    model_name=registered_model_name
 )
-ml_client.models.create_or_update(model)
