@@ -2,6 +2,7 @@ import os
 import json
 import yaml
 import mlflow
+import mlflow.sklearn
 import numpy as np
 import pandas as pd
 
@@ -12,35 +13,23 @@ from xgboost import XGBClassifier
 import joblib
 import pathlib
 
-
 # Azure ML SDK
-from azureml.core import Workspace, Model
-from azureml.core.authentication import ServicePrincipalAuthentication
-
-# 🔐 Cargar variables de entorno desde .env (solo en local)
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass
+from azureml.core import Workspace
+from azureml.core.authentication import AzureCliAuthentication
 
 # Parámetros
 params = yaml.safe_load(open("params.yaml"))
 registered_model_name = params["model"]["registered_model_name"]
 
-# Autenticación con Service Principal
-sp_auth = ServicePrincipalAuthentication(
-    tenant_id=os.environ["AZURE_TENANT_ID"],
-    service_principal_id=os.environ["AZURE_CLIENT_ID"],
-    service_principal_password=os.environ["AZURE_CLIENT_SECRET"]
-)
+# 🔐 Autenticación con Azure ML (usando Azure CLI)
+cli_auth = AzureCliAuthentication()
 
 # Conectar al Workspace
-ws = Workspace.get(
-    name=os.environ["AZURE_WORKSPACE_NAME"],
+ws = Workspace(
     subscription_id=os.environ["AZURE_SUBSCRIPTION_ID"],
     resource_group=os.environ["AZURE_RESOURCE_GROUP"],
-    auth=sp_auth
+    workspace_name=os.environ["AZURE_WORKSPACE_NAME"],
+    auth=cli_auth
 )
 
 # Configurar MLflow con Azure ML
@@ -86,6 +75,7 @@ with mlflow.start_run(run_name="logreg"):
 
     mlflow.log_params({"model": "logreg", **grid_lr.best_params_})
     mlflow.log_metrics({"auc": auc_lr})
+    mlflow.sklearn.log_model(best_lr, "model", registered_model_name=registered_model_name)
 
 # Entrena y evalúa XGBoost
 with mlflow.start_run(run_name="xgboost"):
@@ -97,6 +87,7 @@ with mlflow.start_run(run_name="xgboost"):
 
     mlflow.log_params({"model": "xgboost", **grid_xgb.best_params_})
     mlflow.log_metrics({"auc": auc_xgb})
+    mlflow.sklearn.log_model(best_xgb, "model", registered_model_name=registered_model_name)
 
 # Selección por AUC
 scores = {"logreg": float(auc_lr), "xgboost": float(auc_xgb)}
@@ -112,10 +103,3 @@ joblib.dump(best_model, "models/best_model.pkl")
 # Guarda métricas
 with open("metrics.json", "w") as f:
     json.dump({"auc": best_auc, **scores}, f)
-
-# 📌 Registro oficial del modelo en Azure ML
-Model.register(
-    workspace=ws,
-    model_path="models/best_model.pkl",   # ruta al archivo local
-    model_name=registered_model_name
-)
